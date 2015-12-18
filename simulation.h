@@ -35,7 +35,13 @@ private:
     // int specifying the number of timesteps taken
     int age;
 
+
+    // a vector of all the cells in the sumulation
     vector<Cell> cells;
+
+    // private methods
+
+    int mod (int a, int b);
 };
 
 #endif
