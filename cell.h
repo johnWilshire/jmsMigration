@@ -40,7 +40,7 @@ using namespace std;
 class Cell {
 public:
     // constructor
-    Cell (int x, int y, int s);
+    Cell (int s);
     
     bool has_predators();
     bool has_many_predators();
@@ -48,24 +48,19 @@ public:
     bool has_many_prey();
 
     void add_neighbor(Cell * c);
-    int get_x();
-    int get_y();
     
     int get_status();
-    void set_status(int status);
-
+    
     // based off the cells neighbours gets the next step for this cell
-    void calc_next_status();
+    void calc_next_status(double ph, double pp);
     void step_status();
 
     void print_info();
 
 private:
     vector<Cell *> neighbors;
-    int x, y;
-
     // the current status of the cell
-    int status_num;
+    int status;
 
     // the status that the cell will be at the next time step
     int next_status;

@@ -35,6 +35,17 @@ private:
     // int specifying the number of timesteps taken
     int age;
 
+    // the symbols that are printed in print_cells coorsponding to different states
+    string symbols[8] = {
+    "  ",
+    "HA",
+    "HB",
+    "HC",
+    "MA",
+    "MB",
+    "MC",
+    "MD"
+    };
 
     // a vector of all the cells in the sumulation
     vector<Cell> cells;

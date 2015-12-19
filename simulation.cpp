@@ -6,12 +6,18 @@
 
 #include <iostream>
 #include <vector>
-#include <typeinfo>
 #include "simulation.h"
 #include "cell.h"
 
 using namespace std;
 
+/*
+    Constructor:
+    width of the simulation
+    height of the simulaton
+    invasion probability parameter for prey
+    invasion probability parameter for predators
+*/
 Simulation::Simulation(int w, int h, double ph, double pp)
 {
     age = 0;
@@ -21,18 +27,17 @@ Simulation::Simulation(int w, int h, double ph, double pp)
 
     this->pp = pp;
     this->ph = ph;
-    cout << "width:\t" << width << "\theight:\t" << height << endl;
-    cout << "pp:\t" << pp << "\tph:\t" << ph << endl;
+
     // inst all cells
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
-            int status = ((i + j) % 2 == 0) ? 1 : 0;
-            cells.push_back(Cell {i, j, status});
+            int status = ((i + j) % 2 == 0) ? HA : E;
+            if (status == E) status = (i % 5 == 0) ? MA : E;
+            cells.push_back(Cell { status });
         }
     }
 
-    // set the neighbourhood of the cells
-
+    // connect each cell to its four closest 
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
             Cell* me = get_cell(j,i);
@@ -51,22 +56,24 @@ Simulation::Simulation(int w, int h, double ph, double pp)
 
 }
 
-
+/*
+    prints a visual representation of the simulation.
+*/
 void Simulation::print_cells(){
     cout << "_";
-    for (int j = 0; j < width; j++) cout << "__";
+    for (int j = 0; j < width; j++) cout << "___";
     cout << endl;
     for (int i = 0; i < height; i++){
         for (int j = 0; j < width; j++){
             cout << "|";
-            cout << get_cell(j, i)->get_status();
+            cout << symbols[get_cell(j, i)->get_status()];
         }
         cout << "|" << endl;
     }
     cout << endl;
-
 }
 
+// returns the number of cells with predators (MA..MD).
 int Simulation::cells_with_predators(){
     int count = 0;
     for (int i = 0; i < height; i++){
@@ -94,10 +101,9 @@ int Simulation::mod(int a, int b){
 void Simulation::step_age(){
     for(int i = 0; i < height; i++){
         for (int j = 0; j < width; j++){
-            get_cell(j, i)->calc_next_status();
+            get_cell(j, i)->calc_next_status(ph, pp);
         }
     }
-
     for(int i = 0; i < height; i++){
         for (int j = 0; j < width; j++){
             get_cell(j, i)->step_status();
@@ -107,19 +113,26 @@ void Simulation::step_age(){
     age++;
 }
 
-// s
+// returns a pointer the cell at (x, y)
 Cell* Simulation::get_cell(int x, int y){
     return &cells[y*width +  x];
 }
 
 
-int main(){
-    Simulation s = {10, 10, 0.1, 0.1};
-    cout << "num has_predators " << s.cells_with_predators() << endl;
-    cout << "age: " << s.get_age() << endl;
-    s.print_cells();
-    s.step_age();
-    s.print_cells();
-    s.get_cell(1,1)->print_info();
+int main(int argc, char* argv[]){
+    int id = 0;
+    cout << "id,age, cells_with_predators, ph, pp" << endl;
+    for(double ph = 0.01; ph < 1.0; ph += 0.01){
+        for(double pp = 0.01; pp < 1.0; pp += 0.01){
+            Simulation s = {10, 10, ph, pp};
+            for(int i = 0; i < 100; i++){
+                cout << id << "," << s.get_age() << "," << s.cells_with_predators() 
+                        << "," << ph <<","<< pp << endl;
+                s.step_age();
+            }
+            id++;
+        }
+    }
+    
     return 0;
 }
