@@ -5,11 +5,62 @@
 */
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include "simulation.h"
 #include "cell.h"
 
+
 using namespace std;
+
+int main(int argc, char* argv[]){
+    int iterations = 100;
+    
+    double start = 0.01;
+    double end = 1.0;
+    double step = 0.01;
+
+    string filename = "100_100_";
+    
+    // open files
+    ofstream predator_means;
+    ofstream predators_ts; // time series
+    ofstream life_means;
+    
+    predator_means.open(filename + "_predator_means.csv");
+    predators_ts.open(filename + "_predators_ts.csv");
+    life_means.open(filename + "_life_means.csv");
+
+    // headers
+    predator_means << "id,mean_predators,ph,pp"<< endl;
+    life_means << "id,mean_life,ph,pp"<< endl;
+    predators_ts << "id,age,cells_with_predators,ph,pp"<< endl; 
+
+    int id = 0;
+    for(double ph = start; ph < end; ph += step){
+        cout << ph*100.0 << "% done " << endl;
+        for(double pp = start; pp < end; pp += step){
+            Simulation s = {10, 10, ph, pp};
+            double sum_predators = 0;
+            double sum_life = 0;
+            for(int i = 0; i < iterations; i++){
+                int with_predators = s.cells_with_predators();
+                int with_life = s.cells_with_life();
+                predators_ts << id << "," << s.get_age() << "," << with_predators
+                        << "," << ph <<","<< pp << endl;
+                sum_predators += (double)with_predators;
+                sum_life += (double)with_life;
+                s.step_age();
+            }
+            predator_means << id << "," << sum_predators/(double)iterations << "," << ph << "," << pp << endl;
+            life_means << id << "," << sum_life/(double)iterations << "," << ph << "," << pp << endl;
+            id++;
+        }
+    }
+    
+    return 0;
+}
+
 
 /*
     Constructor:
@@ -42,24 +93,18 @@ Simulation::Simulation(int w, int h, double ph, double pp)
         for(int j = 0; j < width; j++){
             Cell* me = get_cell(j,i);
 
-            Cell* r = get_cell(mod((j + 1), width), i); //right
-            Cell* l = get_cell(mod((j - 1), width), i); //left
-            Cell* u = get_cell(j, mod((i + 1), width)); //up
-            Cell* d = get_cell(j, mod((i - 1), width)); //down
-
-            me->add_neighbor(r);
-            me->add_neighbor(l);
-            me->add_neighbor(u);
-            me->add_neighbor(d);
+            me->add_neighbor(get_cell(mod((j + 1), width), i)); //right
+            me->add_neighbor(get_cell(mod((j - 1), width), i)); //left
+            me->add_neighbor(get_cell(j, mod((i + 1), width))); //up
+            me->add_neighbor(get_cell(j, mod((i - 1), width))); //down
         }
     }
-
 }
 
 /*
     prints a visual representation of the simulation.
 */
-void Simulation::print_cells(){
+void Simulation::print_cells () {
     cout << "_";
     for (int j = 0; j < width; j++) cout << "___";
     cout << endl;
@@ -78,7 +123,20 @@ int Simulation::cells_with_predators(){
     int count = 0;
     for (int i = 0; i < height; i++){
         for (int j = 0; j < width; j++){
-            if (get_cell(i, j)->has_predators()){
+            if (get_cell(j, i)->has_predators()){
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+// returns the number of cells that are alive (!E).
+int Simulation::cells_with_life(){
+    int count = 0;
+    for (int i = 0; i < height; i++){
+        for (int j = 0; j < width; j++){
+            if (get_cell(j, i)->has_life()){
                 count++;
             }
         }
@@ -109,30 +167,10 @@ void Simulation::step_age(){
             get_cell(j, i)->step_status();
         }
     }
-    
     age++;
 }
 
 // returns a pointer the cell at (x, y)
 Cell* Simulation::get_cell(int x, int y){
     return &cells[y*width +  x];
-}
-
-
-int main(int argc, char* argv[]){
-    int id = 0;
-    cout << "id,age, cells_with_predators, ph, pp" << endl;
-    for(double ph = 0.01; ph < 1.0; ph += 0.01){
-        for(double pp = 0.01; pp < 1.0; pp += 0.01){
-            Simulation s = {10, 10, ph, pp};
-            for(int i = 0; i < 100; i++){
-                cout << id << "," << s.get_age() << "," << s.cells_with_predators() 
-                        << "," << ph <<","<< pp << endl;
-                s.step_age();
-            }
-            id++;
-        }
-    }
-    
-    return 0;
 }

@@ -1,4 +1,10 @@
-#ifndef SIMULATON_H
+/*
+    John WIlshire, Dec, 2015
+    Simulaton of Migration Model
+    outlined in J. Maynard Smiths's "Models in Ecology" pg 75
+*/
+
+#ifndef SIMULATION_H
 #define SIMULATION_H
 
 #include "cell.h"
@@ -8,14 +14,17 @@
 using namespace std;
 class Simulation {
 public:
-    //constructor
-    // x, y are the witdth and height of the model
-    // ph is the prob that migration by the prey will occur
-    // pp is the pron that migration by the predator will occur
-
+    /*
+        Constructor:
+        width of the simulation
+        height of the simulaton
+        invasion probability parameter for prey
+        invasion probability parameter for predators
+    */
     Simulation(int width, int height, double ph, double pp);
 
     int cells_with_predators();
+    int cells_with_life();
 
     int get_age();
     void step_age();
@@ -35,7 +44,7 @@ private:
     // int specifying the number of timesteps taken
     int age;
 
-    // the symbols that are printed in print_cells coorsponding to different states
+    // the symbols that are printed in print_cells co-orsponding to different states
     string symbols[8] = {
     "  ",
     "HA",

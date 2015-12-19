@@ -1,30 +1,20 @@
 library(ggplot2)
+library(grid)
 
-preds <- read.csv("test_2.csv")
+predator_means <- read.csv("100_100__predator_means.csv")
+life_means <- read.csv("100_100__life_means.csv")
+qplot(x = pp, y = ph, 
+      data=predator_means, 
+      geom = "tile",
+      fill = mean_predators,
+      main = "Average Number of Cells Containing Predators",
+      ylab = "Prey Migration Parameter",
+      xlab = "Predator Migration Parameter")
 
-pps <- unique(preds$pp)
-phs <- unique(preds$ph)
-m <- c()
-for (ph in phs){
-  print(paste("ph: ",ph))
-  for(pp in pps){
-    print(pp)
-    # append to list (?) I need a more "R" way of doing this
-    sim <- preds[(preds$ph == ph) & (preds$pp == pp),]
-    m <- c(m, mean(sim$cells_with_predators))
-  }
-}
-
-mm <- matrix(m, nrow = length(phs), byrow = TRUE)
-
-image(pps, phs, mm)
-
-plot_all <- function (){
-  for (i in unique(preds$id)){
-    sim <- preds[preds$id == i,]
-    p <- ggplot(sim, aes(x = age, y = cells_with_predators))
-    print(p + geom_line() + ggtitle(
-      paste("ph:", sim$ph[[1]], " pp:", sim$pp[[1]])
-    ))
-  }
-}
+qplot(x = pp, y = ph, 
+      data=life_means, 
+      geom = "tile",
+      fill = mean_life,
+      main = "Average Number of Cells Containing Life",
+      ylab = "Prey Migration Parameter",
+      xlab = "Predator Migration Parameter")

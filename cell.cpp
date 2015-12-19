@@ -18,6 +18,9 @@ bool Cell::has_many_predators(){
     return (status >= MB && status <= MD);
 }
 
+bool Cell::has_life(){
+    return (status != E);
+}
 
 bool Cell::has_many_prey(){
     return (status >= HC && status <= MC);

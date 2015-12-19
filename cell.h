@@ -46,11 +46,11 @@ public:
     bool has_many_predators();
     
     bool has_many_prey();
-
+    bool has_life();
     void add_neighbor(Cell * c);
     
     int get_status();
-    
+
     // based off the cells neighbours gets the next step for this cell
     void calc_next_status(double ph, double pp);
     void step_status();
