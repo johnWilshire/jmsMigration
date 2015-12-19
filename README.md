@@ -1,5 +1,5 @@
 # jmsMigration
-A Simulaton of the migration model outlined in J. Maynard Smiths's "Models in Ecology" pg 75:
+A Simulaton of the migration model outlined in J. Maynard Smiths's "Models in Ecology" pg 76:
 
 
 ![](http://i.imgur.com/Fl4QxtS.jpg)
